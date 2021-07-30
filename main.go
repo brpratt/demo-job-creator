@@ -14,10 +14,12 @@ import (
 )
 
 func main() {
+	// create random job number
 	s1 := rand.NewSource(time.Now().UnixNano())
 	r1 := rand.New(s1)
 	jobNumber := r1.Intn(1000)
 
+	// build client from kubeconfig
 	config, err := clientcmd.BuildConfigFromFlags("", "./kubeconfig")
 	if err != nil {
 		panic(err)
@@ -30,6 +32,7 @@ func main() {
 
 	jobsClient := clientset.BatchV1().Jobs("default")
 
+	// create job specification
 	job := &batchv1.Job{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: fmt.Sprintf("demo-job-%d", jobNumber),
@@ -50,6 +53,7 @@ func main() {
 		},
 	}
 
+	// send job to cluster
 	result, err := jobsClient.Create(context.TODO(), job, metav1.CreateOptions{})
 	if err != nil {
 		panic(err)
